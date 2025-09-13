@@ -13,19 +13,18 @@
 Emscripten - это набор инструментов для компиляции кода C/C++ в WebAssembly.
 
 **Шаги установки:**
-1. Скачайте и установите [Python 3.6+](https://www.python.org/downloads/) (требуется для Emscripten)
-2. Скачайте и установите [Git для Windows](https://git-scm.com/download/win)
-3. Клонируйте Emscripten SDK:
+1. Скачайте и установите [Git для Windows](https://git-scm.com/download/win)
+2. Клонируйте Emscripten SDK:
    ```bash
    git clone https://github.com/emscripten-core/emsdk.git
    cd emsdk
    ```
-4. Установите и активируйте последнюю версию Emscripten:
+3. Установите и активируйте последнюю версию Emscripten:
    ```bash
    emsdk install latest
    emsdk activate latest
    ```
-5. Настройте переменные окружения (выполняйте каждый раз в новом терминале или добавьте в PATH):
+4. Настройте переменные окружения (выполняйте каждый раз в новом терминале или добавьте в PATH):
    ```bash
    emsdk_env.bat
    ```
