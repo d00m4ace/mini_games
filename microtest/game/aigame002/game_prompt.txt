@@ -1,0 +1,330 @@
+----------------------
+
+Add a game mode to the game where players progress through levels starting from 1.
+With each new level, the levels of enemy tanks increase.
+Introduce a PowerUP for players that immediately grants a certain number of levels to the player when the PowerUP is activated.
+
+----------------------
+
+Fix the logic of the splash screens 
+So that the game itself is not displayed on them, i.e. the field with tanks, etc.
+
+----------------------
+
+Add a visual effect of exploding tanks
+
+------------------------
+
+Make it so that as the tank's level increases,
+the tank's movement speed and the speed of its shells increase.
+But keep in mind that the game is designed for a maximum level of 100
+and should be played even at level 100.
+
+--------------------------
+
+Please remove in SPLASH_LEVEL_COMPLETE splash_screen.timer = 3.0f; // 3 second wait before allowing input
+And make all splash screen logic ask to press a specific key or keys to select an option
+
+--------------------------
+
+Please make it so that the mines detonate as soon as the tank touches them with even 1 pixel.
+
+--------------------------
+
+Hide all mines from players and display a mine only when approaching it by 1 cell.
+
+--------------------------
+
+Make sure that the following OBSTACLES:
+OBSTACLE_SHIELD_GENERATOR
+OBSTACLE_AMMO_DEPOT
+OBSTACLE_HEALING_STATION
+
+only appear in empty cells randomly during the game,
+and after they are picked up, they disappear and can reappear in a new empty location after some time.
+
+---------------------------
+Create a more interesting level generator in the spirit of Battle City. Make sure that obstacles are not placed in the same place. Make bridges over water indestructible.
+
+--------------------------
+
+Let's remove the following game elements:
+	OBSTACLE_WALL,
+	OBSTACLE_WOODEN_BLOCK,
+	OBSTACLE_CRACKED_WALL,
+	
+and add an empty obstacle at the very beginning:
+	OBSTACLE_EMPTY,
+
+--------------------------
+
+OBSTACLE_STEEL_WALL Make it so that health increases with level.
+
+---------------------------
+
+Refactor the code.
+Keep 100% functionality and all logic intact.
+Break it down into several header files .h
+They will be connected to game.h sequentially.
+
+--------------------------
+
+```
+// Map legend - defines what each ASCII character represents
+static MapLegend map_legend[] = {
+	{' ', OBSTACLE_EMPTY},          // Empty space (everyone can pass)
+	{'#', OBSTACLE_STEEL_WALL},     // Steel wall (block tanks and bullets, can also be destroyed, reappear after a while)
+	{'~', OBSTACLE_WATER},          // Water (block tanks, bullets can pass)	
+	{'=', OBSTACLE_BRIDGE},         // Bridge (allows tanks to cross water, don't block bullets)
+	{'T', OBSTACLE_FOREST},         // Trees/Forest (everyone can pass, hides tanks and bullets)
+	{'I', OBSTACLE_ICE_BLOCK},      // Ice (slippery, tanks slide when moving on it, bullets can pass)
+	{'Q', OBSTACLE_QUICKSAND},      // Quicksand (slows down tanks significantly, bullets can pass)
+	{'>', OBSTACLE_CONVEYOR_BELT},  // Conveyor belt (move tanks right, bullets can pass)
+	{'<', OBSTACLE_CONVEYOR_BELT},  // Conveyor belt (move tanks left, bullets can pass)
+	{'v', OBSTACLE_CONVEYOR_BELT},  // Conveyor belt (move tanks down, bullets can pass)
+	{'^', OBSTACLE_CONVEYOR_BELT},  // Conveyor belt (move tanks up, bullets can pass)
+	{'M', OBSTACLE_MINE_FIELD},     // Mine field (explodes when tanks move over it, bullets can pass, respawn after a while)	
+	{'H', OBSTACLE_HEALING_STATION},// Healing station (restores tank health/level over time, power up, respawn after some time in a new empty space)
+	{'A', OBSTACLE_AMMO_DEPOT},     // Ammo depot (reduces reload time temporarily, power up, respawn after some time in a new empty space)
+	{'S', OBSTACLE_SHIELD_GENERATOR},// Shield generator (provides temporary invincibility, power up, respawn after some time in a new empty space)
+	{'G', OBSTACLE_GATE},           // Gate (opens/closes periodically, when closed block tanks and bullets)
+	{'R', OBSTACLE_REFLECTOR},      // Reflector (bounces bullets back, tanks can pass)
+	{'@', OBSTACLE_TELEPORTER}      // Teleporter (teleports tanks and bullets to another random teleport)
+};
+
+#define MAP_WIDTH 24
+#define MAP_HEIGHT 24
+
+// Sample map
+char game_map[MAP_HEIGHT][MAP_WIDTH + 1] = {
+	"########################",
+	"#                      #",
+	"#  ##    H      ##     #",
+	"#  ##           ##     #",
+	"#       ~~~~           #",
+	"#       ====      A    #",
+	"#       ~~~~   <v      #",
+	"#              >v      #",
+	"#   @     TTT      @   #",
+	"#        TTTTT         #",
+	"#         TTT          #",
+	"#                      #",
+	"#  III        QQQ      #",
+	"#  III   S    QQQ      #",
+	"#  III        QQQ  ^   #",
+	"#                  ^   #",
+	"#    >>>>      R   ^   #",
+	"#              R   ^   #",
+	"#         M            #",
+	"#       M M M          #",
+	"#   #     M        #   #",
+	"#   ########G#######   #",
+	"#                      #",
+	"########################"
+};
+```
+
+Come up with even more levels for a Battle City-style game.
+Put them together into a single array of levels in C.
+---------------------------
+
+```
+#ifndef GAME_LEVELS_H
+#define GAME_LEVELS_H
+
+#ifndef MAP_WIDTH 
+#define MAP_WIDTH 24
+#endif // MAP_WIDTH
+
+#ifndef MAP_HEIGHT
+#define MAP_HEIGHT 24
+#endif // MAP_HEIGHT
+
+const char* levels[][MAP_HEIGHT] = {
+	// Level 1 - Original
+	{
+		"########################",
+		"#                      #",
+		"#  ##    H      ##     #",
+		"#  ##           ##     #",
+		"#       ~~~~           #",
+		"#       ====      A    #",
+		"#       ~~~~   <v      #",
+		"#              >v      #",
+		"#   @     TTT      @   #",
+		"#        TTTTT         #",
+		"#         TTT          #",
+		"#                      #",
+		"#  III        QQQ      #",
+		"#  III   S    QQQ      #",
+		"#  III        QQQ  ^   #",
+		"#                  ^   #",
+		"#    >>>>      R   ^   #",
+		"#              R   ^   #",
+		"#         M            #",
+		"#       M M M          #",
+		"#   #     M        #   #",
+		"#   ########G#######   #",
+		"#                      #",
+		"########################"
+	},
+
+	// Level 2 - Crossroads Chaos
+	{
+		"########################",
+		"#      TTT    TTT      #",
+		"#  ##   TTT  TTT   ##  #",
+		"#  ##         A    ##  #",
+		"#   >>>>     ====   ^  #",
+		"#   v  ~~~~   ~~    ^  #",
+		"#   v  ~~~~   ~~    ^  #",
+		"#   v  H      S     ^  #",
+		"#   v      #######  ^  #",
+		"#   v      #     #  ^  #",
+		"#   v   M  #  R  #  ^  #",
+		"#   v      #     #  ^  #",
+		"#   v      #######  ^  #",
+		"#   >>>>            ^  #",
+		"#  I  I     QQQQ    ^  #",
+		"#  I  I     Q  Q    ^  #",
+		"#  I  I     QQQQ    ^  #",
+		"#       @       @      #",
+		"#   ###    GGG    ###  #",
+		"#   ###    GGG    ###  #",
+		"#   ###         M ###  #",
+		"#         M   M        #",
+		"#                      #",
+		"########################"
+	},
+
+	// Level 3 - Fortress Frenzy
+	{
+		"########################",
+		"#   H      ####     A  #",
+		"#   ~~~~   #  #   ~~~~ #",
+		"#   ====   #  #   ==== #",
+		"#   ~~~~   ####   ~~~~ #",
+		"#                 M    #",
+		"#   #######   #######  #",
+		"#   #     #   #     #  #",
+		"#   #  S  ### ### R #  #",
+		"#   #               #  #",
+		"#   ###  ^^^^^^  ###   #",
+		"#     #  ^    ^  #     #",
+		"#     #  ^  M ^  #     #",
+		"#     ###^^^^^^###     #",
+		"#        #     #       #",
+		"#   @    #     #    @  #",
+		"#        #######       #",
+		"#     III  QQQ  III    #",
+		"#     III  Q Q  III    #",
+		"#     III  QQQ  III    #",
+		"#     M     G     M    #",
+		"#                      #",
+		"#                      #",
+		"########################"
+	},
+
+	// Level 4 - Conveyor Mayhem
+	{
+		"########################",
+		"#  >>>>   H   <<<<     #",
+		"#  v  v       v  v     #",
+		"#  v  v   M   v  v     #",
+		"#  v  v       v  v     #",
+		"#  >>>>       <<<<     #",
+		"#                      #",
+		"#  TTTTT       TTTTT   #",
+		"#  TTTTT       TTTTT   #",
+		"#  TTTTT       TTTTT   #",
+		"#   @   #######   @    #",
+		"#       #     #        #",
+		"#  S    #  R  #    A   #",
+		"#       #     #        #",
+		"#   ^   #######   ^    #",
+		"#   ^     M M     ^    #",
+		"#   ^             ^    #",
+		"#   ^   QQQQQQ    ^    #",
+		"#   ^   Q    Q    ^    #",
+		"#   ^   QQQQQQ    ^    #",
+		"#   ^^^^^^^^^^^^^^^    #",
+		"#                      #",
+		"#                      #",
+		"########################"
+	}
+};
+
+#define NUM_LEVELS (sizeof(levels) / sizeof(levels[0]))
+
+#endif // GAME_LEVELS_H
+```
+
+Come up with even more levels for a Battle City-style game.
+Put them together into a single array of levels in C.
+
+---------------------------------
+
+This is a 2D Battle City - style game with a top - down view.
+Please Add more new levels.
+Don't rewrite the entire code, just add new parts. 
+
+---------------------------------
+
+Look at the code and correct the code for handling collisions between tanks and obstacles so that when an insurmountable obstacle is detected, it can adjust its movement to pass through a narrow space, for example, in one tile, even if the tank penetrates the obstacle by a few pixels. Move it slightly so that it can continue moving.
+Examples:
+1. A tank tries to pass between two walls separated by an empty tile or an open door, but in doing so, it touches one of the walls on one of its sides by a couple of pixels.
+2. The path that moves the tank in a certain direction drives it into a wall, but the tank itself tries to move along the wall. Make it so that it can move along the wall exactly along the edge of the obstacle.
+
+----------------------------
+
+In the update_tank_with_ai_movement function,
+
+at the end, check if collision_detected:
+
+ if(collision_detected) {
+     tank->position = old_position;
+     tank->velocity = Vector2Scale(tank->velocity, 0.5f);
+ }
+ 
+ Rewrite the logic so that it checks 
+ 
+ tank->position = old_position
+ 
+ the possibility of movement along x or y for travel in +1 +2 and -1 -2 along x, or along y as well
+ 
+You need to make it so that the tank can pass corners of obstacles by aligning itself slightly, thereby making it easier to control tanks when passing between two obstacles or when skidding into a wall when the movement vector is not completely in the direction of the wall normal.
+
+----------------------------------
+
+Let's refactor the code while maintaining 100% functionality.
+Add to Obstacle:
+
+bool is_block_tanks 
+bool is_block_bullets
+
+For doors, set these variables to true when opening.
+
+For destroyed obstacles, set to true.
+
+For OBSTACLE_STEEL_WALL, if it is not destroyed, set it to true.
+
+And so on.
+
+Fix the collision and movement processing logic by simplifying it,
+mostly by checking is_block_tanks and is_block_bullets.
+
+----------------------------------
+
+Fix the logic of update_tank_with_ai_movement collision and movement processing by simplifying it
+mostly by operating with the is_block_tanks and is_block_bullets checks
+
+Remove spacial check if there's adequate bridge coverage for water tiles it's need be standard check 
+
+----------------------------------
+
+Fix the logic of bool check_obstacle_collision_enhanced(Rectangle rect, bool is_tank, Tank* tank) collision and movement processing by simplifying it
+mostly by using the is_block_tanks and is_block_bullets checks
+
+Remove spatial check if there is adequate bridge coverage for water tiles, it is necessary to perform a standard check. 
+
+---------------------------------

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <title>d00m4ace mini web game</title>
+
+    <meta name="title" content="d00m4ace mini web game">
+    <meta name="description" content="New web videogame, developed using C">
+    <meta name="keywords" content="programming, examples, html5, C, library, learn, games, videogames, web games, mini games">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #dfe6e9;
+        position: relative;
+      }
+      canvas.emscripten {
+        /*image-rendering: pixelated;*/
+        /*image-rendering: crisp-edges;*/
+        border: none;
+        background-color: #ffffff;
+        max-width: 100%;
+        max-height: 100%;
+      }
+      
+      canvas:focus {
+        outline: none; /* Removes blue glow or border */
+      }
+    
+      canvas {
+        user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+      }
+      
+      .footer-link {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        z-index: 10;
+      }
+      
+      .footer-link a {
+        color: #2d3436;
+        text-decoration: none;
+        padding: 8px 16px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+      
+      .footer-link a:hover {
+        background-color: rgba(255, 255, 255, 1);
+        color: #0984e3;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+
+    <script type='text/javascript' src="https://cdn.jsdelivr.net/gh/eligrey/FileSaver.js/dist/FileSaver.min.js"></script>
+
+    <script type='text/javascript'>
+      function saveFileFromMEMFSToDisk(memoryFSname, localFSname) {
+        var isSafari = false; // User agent access is limited
+        var data = FS.readFile(memoryFSname);
+        var blob;
+
+        if (isSafari) blob = new Blob([data.buffer], { type: "application/octet-stream" });
+        else blob = new Blob([data.buffer], { type: "application/octet-binary" });
+
+        saveAs(blob, localFSname);
+      }
+    </script>
+
+  </head>
+  <body>
+
+    <input type="file" id="fileInput" style="display:none" />
+    <script>
+      function openFile(callback) {
+        const input = document.getElementById('fileInput');
+        input.onchange = (event) => {
+          const file = event.target.files[0];
+          const reader = new FileReader();
+          reader.onload = () => {
+            const data = new Uint8Array(reader.result);
+            // Allocate memory in Emscripten heap
+            const buffer = Module._malloc(data.length);
+            Module.HEAPU8.set(data, buffer);
+            // Call your C function with pointer and length
+            Module.ccall('LoadFileCallback', null, ['number', 'number'], [buffer, data.length]);
+            Module._free(buffer);
+          };
+          reader.readAsArrayBuffer(file);
+        };
+        input.click();
+      }
+    </script>
+
+    <script>
+      async function pasteFromClipboard() {
+        try {
+          const text = await navigator.clipboard.readText();
+          // Преобразуем в C-строку
+          const lengthBytes = lengthBytesUTF8(text) + 1;
+          const stringOnWasmHeap = Module._malloc(lengthBytes);
+          stringToUTF8(text, stringOnWasmHeap, lengthBytes);
+          Module.ccall('OnClipboardPaste', null, ['number'], [stringOnWasmHeap]);
+          // Не забудь освободить память в C при необходимости
+        } catch (err) {
+          console.error('Ошибка при вставке:', err);
+        }
+      }
+    </script>
+
+    <script>
+      function copyToClipboard(ptr) {
+        const text = UTF8ToString(ptr);
+        navigator.clipboard.writeText(text).then(() => {
+          console.log('Скопировано:', text);
+        }).catch(err => {
+          console.error('Ошибка при копировании:', err);
+        });
+      }
+    </script>
+
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    <p id="output"></p>
+    
+    <div class="footer-link">
+      <a href="https://d00m4ace.com/" target="_blank">🎮 d00m4ace.com</a>
+    </div>
+
+    <script>
+      var Module = {
+        print: (function() {
+          var element = document.getElementById('output');
+          if (element) element.value = '';
+          return function(text) {
+            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+            console.log(text);
+            if (element) {
+              element.value += text + "\n";
+              element.scrollTop = element.scrollHeight;
+            }
+          };
+        })(),
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+          return canvas;
+        })()
+      };
+    </script>
+
+    {{{ SCRIPT }}}
+    
+    
+<script>
+        window.onload = () => {
+            const canvas = document.getElementsByTagName("canvas")[0];
+            canvas.setAttribute("tabindex", "0");
+            canvas.focus();
+
+            document.addEventListener("keydown", function(e) {
+                if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
+                    e.preventDefault();
+                }
+            });
+        };
+</script>    
+    
+    
+  </body>
+</html>

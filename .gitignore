@@ -1,0 +1,31 @@
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Xx]64/
+[Xx]86/
+[Bb]uild/
+
+vcpkg_installed/
+
+.env/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.7z
+
+/microtest/resources/
+/microtest/downloads/
+/microtest/persistent/
+
+/python/art/
+/python/out/
+/python/in/
+/python/dirfiles/
+/python/imgs_in/
+/python/imgs_out/
