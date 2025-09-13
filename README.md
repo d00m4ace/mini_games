@@ -107,13 +107,13 @@ microtest/
 ├── main.c              # Основной исходный код игры
 ├── minshell.html       # Пользовательский HTML шаблон
 ├── resources/          # Игровые ресурсы (текстуры, звуки и т.д.)
-└── raylibweb/          # Библиотека raylib для веб (см. установку выше)
-    ├── libraylib.a     # Скомпилированная библиотека raylib для Web
-    ├── raylib.h        # Основной заголовочный файл raylib
-    ├── raymath.h       # Математические функции raylib
-    ├── rlgl.h          # Слой абстракции OpenGL raylib
-    └── external/       # Внешние зависимости
-        └── glfw/       # Заголовки GLFW
+raylibweb/          # Библиотека raylib для веб (см. установку выше)
+├── libraylib.a     # Скомпилированная библиотека raylib для Web
+├── raylib.h        # Основной заголовочный файл raylib
+├── raymath.h       # Математические функции raylib
+├── rlgl.h          # Слой абстракции OpenGL raylib
+└── external/       # Внешние зависимости
+    └── glfw/       # Заголовки GLFW
 ```
 
 ### Компиляция
