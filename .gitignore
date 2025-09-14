@@ -18,8 +18,3 @@ __pycache__/
 *$py.class
 
 *.7z
-
-/microtest/resources/
-/microtest/downloads/
-/microtest/persistent/
-
